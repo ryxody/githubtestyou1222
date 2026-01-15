@@ -2,7 +2,6 @@
 #include <util/delay.h>
 
 
-/*=============BASIC CONNECTION CONFIGURURATION========================*/
 #define BT1_PIN A0  //LEFT HAND
 #define BT2_PIN A1  //RIGHT HAND
 #define BT3_PIN A2  //EXT
@@ -13,27 +12,20 @@
 #define LED_R A3
 #define LED_G A4
 #define LED_B A5
-/*=====================================================================*/
 
-
-/*============DEVICE BEHAVIOR CONFIGURURATION==========================*/
 #define BYPASS_PASSIVE_DELAY 50 // The asynchronous rolling delay(count by times)
 
 #define BYPASS_TIMER_ISR 1 // BYPASS TIME CORRECTER
 
 #define USB_ATTACH_FAIL_COUNT 50000 // The max retry time before reset when Failt to attached to USB HOST
 
-//#define ENABLE_DEBUG_OUTPUT  //Close it when using, for it will reduce the SPEED of refrush(We need DMA QAQ)
 
 #define BT1_PIN_BEHAVIOR KEY_Z
 #define BT2_PIN_BEHAVIOR KEY_X
 #define BT3_PIN_BEHAVIOR KEY_ESC
-/*=====================================================================*/
 
-
-/*============INITAL GLOBLE VARIABLES==================================*/
-bool fore_KEY_BT1 = false;        //The variables to hold the previous status of the button
-double fore_KET_BT1_RUNTIME = 0;  //For asynchronous delay, the rolling times when the event is triggered
+bool fore_KEY_BT1 = false;        
+double fore_KET_BT1_RUNTIME = 0; 
 
 bool fore_KEY_BT2 = false;
 double fore_KET_BT2_RUNTIME = 0;
@@ -41,61 +33,36 @@ double fore_KET_BT2_RUNTIME = 0;
 bool fore_KEY_BT3 = false;
 double fore_KET_BT3_RUNTIME = 0;
 
-int BT1_LED_ALPHA = 0;           //The present brightness of the LED onto the button
-int BT1_LED_ALPHA_TARGET = 0;    //The target brightness of the LED onto the button
+int BT1_LED_ALPHA = 0;           
+int BT1_LED_ALPHA_TARGET = 0; 
 int BT2_LED_ALPHA = 0;
 int BT2_LED_ALPHA_TARGET = 0;
 
-// We use HUE instead of RGB to have better controlling of the colour
 
-int LED_TARGET_H = 0;  	//Hues
+int LED_TARGET_H = 0;
 int LED_PRESENT_H = 0;
 
-int LED_TARGET_U = 0;  	//Saturation	
+int LED_TARGET_U = 0;
 int LED_PRESENT_U = 0;
 
-int LED_TARGET_E = 0;  	//Brightness		
+int LED_TARGET_E = 0;
 int LED_PRESENT_E = 0;
 
 
 uchar reportBuffer[4] = {0,0,0,0};  
-/* Report Buffer Prefix
- reportBuffer[0]-> NULL -> 0
- reportBuffer[1]-> BT2 -> KEY_X
- reportBuffer[2]-> BT3 -> KEY_ESC
- reportBuffer[3]-> BT1-> KEY_Z
- */
  
- long loop_route_time = 0;  //For asynchronous delay, the rolling times
+ long loop_route_time = 0;  
  
- bool KEY_CHANGE_REQUEST = false; //For acknowledge the event need to be updated
+ bool KEY_CHANGE_REQUEST = false;
  
  bool BT_STATUS[3] = {1,1,1};
  
-/*======================================================================*/
-
-//*************************************************************************************************
 void setup() {
   
-//===============INIT THE SYSTEM PRINT OUT BOOT INFORMATION============
-  Serial.begin(115200);
 
-  Serial.println("=========================================================");
-  Serial.println("     Arduino OSU Keyboard    Designed by MartinT3CH      ");
-  Serial.println("          GITHUB https://github.com/MarsTechHAN          ");
-  Serial.println("         Opensource under lincense GNU/GPL v3            ");
-  Serial.println("            BUILD   "__DATE__" "__TIME__"                      ");
-  Serial.println("=========================================================");
-  
- //====================DEBUG OPTION-> ACKNOWLEDGEMENT===================
 #ifdef ENABLE_DEBUG_OUTPUT
-  Serial.println("WARNING: DEBUG OUTPUT has been turned on, which may redu-");
-  Serial.println("ce the performance! Disable #define ENABLE_DEBUG_OUTPUT !");
-  Serial.println("");
-  Serial.print(  "SYSTEM BOOTING.........................................");
 #endif
 
-//=======================INIT THE PIN====================================
   pinMode(BT1_PIN, INPUT_PULLUP);
   pinMode(BT2_PIN, INPUT_PULLUP);
   pinMode(BT3_PIN, INPUT_PULLUP);
@@ -114,13 +81,10 @@ void setup() {
   analogWrite(LED_G, 255);
   analogWrite(LED_B, 255);
 
- //====================DISABLE THE TIMER0=============================
 #if BYPASS_TIMER_ISR
-  // disable timer 0 overflow interrupt (used for millis)
-  TIMSK0 &= !(1 << TOIE0); // ++
+  TIMSK0 &= !(1 << TOIE0); 
 #endif                 
 
-//=====================SELF DIGNOISIS(OPTIONAL)=========================
  int fail_count = 0;
 #ifdef ENABLE_DEBUG_OUTPUT
   Serial.println("OK");
@@ -153,7 +117,6 @@ void setup() {
 
 }
 
-//*************************************************************************************************
 #if BYPASS_TIMER_ISR
 void delayMs(unsigned int ms) {
   /*
@@ -163,10 +126,7 @@ void delayMs(unsigned int ms) {
   }
 }
 #endif
-//*************************************************************************************************
 
-
-//*************************************************************************************************
 void loop() {
   
   UsbKeyboard.update();
@@ -326,4 +286,3 @@ void loop() {
   }else{delayMicroseconds(100);}
   
 }
-//*************************************************************************************************
